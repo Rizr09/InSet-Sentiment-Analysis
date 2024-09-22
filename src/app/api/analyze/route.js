@@ -81,6 +81,10 @@ export async function POST(req) {
 
     // log pwd
     console.log('process.cwd():', process.cwd());
+    // log __dirname
+    console.log('__dirname:', __dirname);
+    // log ls
+    console.log('ls:', fs.readdirSync(process.cwd()));
 
     const positiveLexicon = await loadLexicon('public/inset/positive.tsv');
     const negativeLexicon = await loadLexicon('public/inset/negative.tsv');
