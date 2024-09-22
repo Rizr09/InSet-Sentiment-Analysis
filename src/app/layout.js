@@ -14,7 +14,7 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "InSet Sentiment Analysis",
-  description: "Made with love by Rizky",
+  description: "Composed using a collection of words from Indonesian tweets, InSet was constructed by manually weighting each word and enhanced by adding stemming and synonym sets. The result is a comprehensive lexicon containing 3,609 positive words and 6,609 negative words, with scores ranging from -5 to +5.",
 };
 
 export default function RootLayout({ children }) {
