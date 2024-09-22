@@ -1,17 +1,22 @@
 import fs from 'fs';
-import path from 'path';
-import csv from 'csv-parser';
+import fetch from 'node-fetch';
 
-const loadLexicon = (filePath) => {
-  return new Promise((resolve, reject) => {
-    const results = new Map();
-    // use path.resolve
-    fs.createReadStream(path.join(__dirname, "../../../../", filePath), "utf8")
-      .pipe(csv({ separator: '\t', headers: ['word', 'weight'] }))
-      .on('data', (data) => results.set(data.word, parseFloat(data.weight)))
-      .on('end', () => resolve(results))
-      .on('error', (error) => reject(error));
+const POSITIVE_LEXICON_URL = 'https://raw.githubusercontent.com/fajri91/InSet/refs/heads/master/positive.tsv';
+const NEGATIVE_LEXICON_URL = 'https://raw.githubusercontent.com/fajri91/InSet/refs/heads/master/negative.tsv';
+
+const loadLexicon = async (url) => {
+  const response = await fetch(url);
+  const text = await response.text();
+  const results = new Map();
+
+  text.split('\n').forEach(line => {
+    const [word, weight] = line.split('\t');
+    if (word && weight) {
+      results.set(word, parseFloat(weight));
+    }
   });
+
+  return results;
 };
 
 const preprocessText = (text) => {
@@ -79,15 +84,11 @@ export async function POST(req) {
       });
     }
 
-    // log pwd
-    console.log('process.cwd():', process.cwd());
-    // log __dirname
-    console.log('__dirname:', __dirname);
-    // log ls
-    console.log('ls:', fs.readdirSync(process.cwd()));
-
-    const positiveLexicon = await loadLexicon('public/inset/positive.tsv');
-    const negativeLexicon = await loadLexicon('public/inset/negative.tsv');
+    // Load lexicons from URLs
+    const [positiveLexicon, negativeLexicon] = await Promise.all([
+      loadLexicon(POSITIVE_LEXICON_URL),
+      loadLexicon(NEGATIVE_LEXICON_URL)
+    ]);
     
     const result = calculateSentiment(text, positiveLexicon, negativeLexicon);
     
