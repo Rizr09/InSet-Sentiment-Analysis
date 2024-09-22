@@ -1,101 +1,116 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState } from 'react';
+import Head from 'next/head';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { duotoneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const InSetExplanation = () => (
+  <div className="bg-indigo-100 border-l-4 border-indigo-500 text-indigo-700 p-4 mb-6 rounded">
+    <p className="font-bold">About InSet (Indonesia Sentiment Lexicon):</p>
+    <p className="mt-2">
+      Composed using a collection of words from Indonesian tweets, InSet was constructed by manually weighting each word and enhanced by adding stemming and synonym sets. The result is a comprehensive lexicon containing 3,609 positive words and 6,609 negative words, with scores ranging from -5 to +5.
+    </p>
+  </div>
+);
+
+const SentimentResult = ({ result }) => (
+  <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+    <h2 className="text-xl font-semibold">Hasil Analisis:</h2>
+    <div className="bg-gray-100 p-4 rounded-md overflow-auto">
+      <p><strong>Verdict:</strong> {result.verdict}</p>
+      <p><strong>Score:</strong> {result.score.toFixed(2)}</p>
+      <p><strong>Comparative:</strong> {result.comparative.toFixed(2)}</p>
+      <p><strong>Positive words:</strong> {result.positive.join(', ')}</p>
+      <p><strong>Negative words:</strong> {result.negative.join(', ')}</p>
+    </div>
+  </div>
+);
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [text, setText] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const analyzeSentiment = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setResult(data);
+    } catch (error) {
+      console.error('Error:', error);
+      setError('An error occurred while analyzing the sentiment. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+      <Head>
+        <title>Analisis Sentimen InSet</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div className="absolute inset-0 bg-indigo-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+          <div className="max-w-md mx-auto">
+            <h1 className="text-2xl font-semibold text-black mb-5">
+              <a href='https://www.researchgate.net/publication/321757985_InSet_Lexicon_Evaluation_of_a_Word_List_for_Indonesian_Sentiment_Analysis_in_Microblogs' target='_blank' rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
+                Analisis Sentimen Menggunakan <span className='underline decoration-violet-600'>InSet (Indonesia Sentiment Lexicon)</span>
+              </a>
+            </h1>
+
+            <InSetExplanation />
+
+            <div className="space-y-6">
+              <div className="flex flex-col">
+                <label htmlFor="text-input" className="text-sm font-medium text-gray-700 mb-1">Teks untuk dianalisis, untuk referensi preprocessing liat <a href='https://github.com/agushendra7/twitter-sentiment-analysis-using-inset-and-random-forest' target='_blank' className='underline'>disini</a></label>
+                <textarea
+                  id="text-input"
+                  className="px-4 py-2 border focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md text-black"
+                  rows="4"
+                  placeholder="Masukkan teks di sini"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                ></textarea>
+              </div>
+              <button
+                className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                onClick={analyzeSentiment}
+                disabled={loading || !text.trim()}
+              >
+                {loading ? 'Menganalisis...' : 'Analisis Sentimen'}
+              </button>
+              {error && (
+                <div className="text-red-600 text-sm">{error}</div>
+              )}
+              {result && (
+                <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+                  <h2 className="text-xl font-semibold">Hasil Analisis:</h2>
+                  <SyntaxHighlighter language="json" style={duotoneDark} className="bg-gray-100 p-4 rounded-md overflow-auto">
+                    {JSON.stringify(result, null, 2)}
+                  </SyntaxHighlighter>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="mt-4 text-center text-sm text-black">
+            Made with ❤️ by rizr09
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
