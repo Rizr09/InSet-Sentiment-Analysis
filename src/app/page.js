@@ -67,8 +67,8 @@ export default function Home() {
         <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
           <div className="max-w-md mx-auto">
             <h1 className="text-2xl font-semibold text-black mb-5">
-              <a href='https://www.researchgate.net/publication/321757985_InSet_Lexicon_Evaluation_of_a_Word_List_for_Indonesian_Sentiment_Analysis_in_Microblogs' target='_blank' rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
-                Analisis Sentimen Menggunakan <span className='underline decoration-violet-600'>InSet (Indonesia Sentiment Lexicon)</span>
+              <a href='https://www.researchgate.net/publication/321757985_InSet_Lexicon_Evaluation_of_a_Word_List_for_Indonesian_Sentiment_Analysis_in_Microblogs' target='_blank' rel="noopener noreferrer" className="">
+                Analisis Sentimen Menggunakan <span className='hover:text-indigo-600 transition-colors underline decoration-violet-600'>InSet (Indonesia Sentiment Lexicon)</span>
               </a>
             </h1>
 
