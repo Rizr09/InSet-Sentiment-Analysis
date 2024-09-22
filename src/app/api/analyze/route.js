@@ -5,6 +5,7 @@ import csv from 'csv-parser';
 const loadLexicon = (filePath) => {
   return new Promise((resolve, reject) => {
     const results = new Map();
+    // use path.resolve
     fs.createReadStream(path.join(process.cwd(), filePath))
       .pipe(csv({ separator: '\t', headers: ['word', 'weight'] }))
       .on('data', (data) => results.set(data.word, parseFloat(data.weight)))
@@ -77,6 +78,9 @@ export async function POST(req) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+
+    // log pwd
+    console.log('process.cwd():', process.cwd());
 
     const positiveLexicon = await loadLexicon('public/inset/positive.tsv');
     const negativeLexicon = await loadLexicon('public/inset/negative.tsv');
