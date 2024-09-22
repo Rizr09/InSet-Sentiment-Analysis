@@ -6,7 +6,7 @@ const loadLexicon = (filePath) => {
   return new Promise((resolve, reject) => {
     const results = new Map();
     // use path.resolve
-    fs.createReadStream(path.join(process.cwd(), filePath))
+    fs.createReadStream(path.join(__dirname, "../../../../", filePath), "utf8")
       .pipe(csv({ separator: '\t', headers: ['word', 'weight'] }))
       .on('data', (data) => results.set(data.word, parseFloat(data.weight)))
       .on('end', () => resolve(results))
